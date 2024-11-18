@@ -1,49 +1,38 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import API_URL from '../services/api'; // Import API_URL ici
+import { adminLogin } from '../services/api';
 import '../styles/Login.css';
 
-function Login() {
+function AdminLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [token, setToken] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
-      const token = response.data.token;
-      localStorage.setItem('token', token);
-      navigate('/dashboard');
+      const response = await adminLogin({ email, password });
+      setToken(response.token); // Stocke le token retourné par l'API
+      localStorage.setItem('token', response.token); // Facultatif : stocker le token dans localStorage
+      setErrorMessage('');
     } catch (error) {
-      setError('Échec de la connexion. Veuillez vérifier vos identifiants.');
+      setErrorMessage('Identifiants incorrects ou problème serveur.');
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Connexion</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div>
+      <h2>Connexion Administrateur</h2>
+      {token && <p style={{ color: 'green' }}>Connexion réussie. Votre token : {token}</p>}
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       <form onSubmit={handleLogin}>
         <label>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          Email :
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label>
-          Mot de passe:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          Mot de passe :
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </label>
         <button type="submit">Se connecter</button>
       </form>
@@ -51,4 +40,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default AdminLoginForm;

@@ -1,12 +1,36 @@
-// src/services/api.js
+import axios from 'axios';
 
-// Définissez API_URL en premier
-const API_URL = "http://localhost:5000"; // Remplacez par l'URL de votre backend
+// URL de base de votre backend
+const API_URL = 'http://localhost:3000'; // Remplacez par l'URL réelle de votre backend
 
-// Exportez API_URL et fetchData
-export default API_URL;
+// Instance Axios configurée
+const instance = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json', // Envoie les données au format JSON
+  },
+});
 
-export async function fetchData() {
-  const response = await fetch(`${API_URL}/api/data`);
-  return await response.json();
-}
+// Fonction pour l'inscription (signup)
+export const adminSignup = async (adminData) => {
+  try {
+    const response = await instance.post('/admin/signup', adminData); // Appel API backend
+    return response.data; // Retourne la réponse du serveur
+  } catch (error) {
+    console.error('Erreur lors de l\'inscription :', error.response?.data || error.message);
+    throw error; // Remontez l'erreur pour qu'elle puisse être gérée côté composant
+  }
+};
+
+// Fonction pour la connexion (login)
+export const adminLogin = async (credentials) => {
+  try {
+    const response = await instance.post('/admin/login', credentials); // Appel API backend
+    return response.data; // Retourne le token ou les données
+  } catch (error) {
+    console.error('Erreur lors de la connexion :', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export default instance;
